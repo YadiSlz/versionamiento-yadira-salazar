@@ -16,6 +16,8 @@ request.onupgradeneeded = function(event) {
     db.createObjectStore('products', { keyPath: 'id' });
 };
 
+let editingProductId = null; // Tracks which product (if any) is being edited
+
 //Load/Read products from IndexedDB and display them in the table
 function loadProductTable() {
     const transaction = db.transaction(['products'], 'readonly');
@@ -55,6 +57,15 @@ function loadProductTable() {
             priceCell.textContent = pesoFormatter.format(product.price);
 
             const actionsCell = document.createElement('td');
+            actionsCell.className = 'actions-cell';
+
+            const editButton = document.createElement('button');
+            editButton.className = 'edit-btn';
+            editButton.dataset.id = product.id;
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => editProduct(product));
+            actionsCell.appendChild(editButton);
+
             const deleteButton = document.createElement('button');
             deleteButton.className = 'delete-btn';
             deleteButton.dataset.id = product.id;
@@ -71,7 +82,7 @@ function loadProductTable() {
     };
 }
 
-//Add/Create a new product
+//Add a new product, or save changes if a product is currently being edited
 function addProduct() {
     const name = document.getElementById('name').value.trim();
     const price = parseFloat(document.getElementById('price').value);
@@ -84,6 +95,17 @@ function addProduct() {
 
     const transaction = db.transaction(['products'], 'readwrite');
     const store = transaction.objectStore('products');
+
+    if (editingProductId !== null) {
+        //Save changes to the existing product
+        store.put({ id: editingProductId, name: name, price: price });
+
+        transaction.oncomplete = function() {
+            resetForm();
+            loadProductTable();
+        };
+        return;
+    }
 
     //Get/Read the products
     const getAllRequest = store.getAll();
@@ -98,13 +120,28 @@ function addProduct() {
 
     //Add/Create the new product to the DB
         store.add(newProduct);
-        //Clear the form fields
-        document.getElementById('name').value = '';
-        document.getElementById('price').value = '';
 
-    //Update the table with the new product
+    //Clear the form and update the table with the new product
+        resetForm();
         loadProductTable();
     };
+}
+
+//Load a product's data into the form so it can be edited
+function editProduct(product) {
+    editingProductId = product.id;
+    document.getElementById('name').value = product.name;
+    document.getElementById('price').value = product.price;
+    document.getElementById('addProduct').textContent = 'Update Product';
+    document.getElementById('name').focus();
+}
+
+//Clear the form fields and exit edit mode (if active)
+function resetForm() {
+    editingProductId = null;
+    document.getElementById('name').value = '';
+    document.getElementById('price').value = '';
+    document.getElementById('addProduct').textContent = 'Add Product';
 }
 
 //Delete a product
@@ -115,6 +152,11 @@ function deleteProduct(event) {
 
     //Delete the product with the corresponding ID
     store.delete(productId);
+
+    //If the deleted product was being edited, exit edit mode
+    if (editingProductId === productId) {
+        resetForm();
+    }
 
     //Reload the product table to reflect changes
     loadProductTable();

@@ -153,18 +153,43 @@ td {
     color: #9C2963;
 }
 
-.delete-btn {
-    background-color: #FFADAD;
-    color: #7A1F1F;
-    border: none;
-    padding: 6px 12px;
+.actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.actions-cell button {
+    width: auto;
+    flex: 1;
+}
+
+.edit-btn {
+    background: #FFFFFF;
+    color: #E0558F;
+    border: 2px solid #F6A8C9;
+    padding: 4px 10px;
     border-radius: 14px;
     cursor: pointer;
     font-weight: 600;
 }
 
+.edit-btn:hover {
+    background: #FFE9F2;
+    border-color: #E0558F;
+}
+
+.delete-btn {
+    background: #FF6B6B;
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
 .delete-btn:hover {
-    background-color: #FF8A8A;
+    background: #FF4D4D;
 }
 
 .empty-row {
