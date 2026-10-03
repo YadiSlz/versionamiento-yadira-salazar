@@ -126,14 +126,20 @@ button:hover {
     transform: translateY(-2px);
 }
 
-table {
+.table-wrapper {
     width: 60%;
+    overflow-x: auto;
+    border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(224, 85, 143, 0.2);
+}
+
+table {
+    width: 100%;
+    min-width: 480px;
     border-collapse: separate;
     border-spacing: 0;
-    margin: 0 auto;
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(224, 85, 143, 0.2);
 }
 
 th, td {
@@ -214,4 +220,47 @@ td {
     background-color: #FFD6E8;
     color: #9C2963;
     font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: stretch;
+        width: 92%;
+        margin-top: 28px;
+    }
+
+    .formContainer {
+        width: 100%;
+        box-sizing: border-box;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .table-wrapper {
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.6em;
+    }
+
+    .formContainer {
+        padding: 22px 16px;
+    }
+
+    th, td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .app-footer {
+        font-size: 12px;
+    }
 }
