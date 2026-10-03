@@ -26,23 +26,47 @@ function loadProductTable() {
     request.onsuccess = function(event) {
         const products = event.target.result;
         const tableBody = document.querySelector('#productsTable tbody');
-        tableBody.innerHTML = ''; // Clear the table before adding new products
+        tableBody.textContent = ''; // Clear the table before adding new products
+
+        if (products.length === 0) {
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.colSpan = 4;
+            emptyCell.className = 'empty-row';
+            emptyCell.textContent = 'No products yet. Add your first one!';
+            emptyRow.appendChild(emptyCell);
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        const pesoFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
         products.forEach(product => {
-            //Create a table row
+            //Create a table row using safe DOM methods (avoids innerHTML/XSS)
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>$${product.price}</td>
-                <td><button class="delete-btn" data-id="${product.id}">Delete</button></td>
-            `;
-            tableBody.appendChild(row);
-        });
 
-    //Add event listeners for delete buttons
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', deleteProduct);
+            const idCell = document.createElement('td');
+            idCell.textContent = product.id;
+
+            const nameCell = document.createElement('td');
+            nameCell.textContent = product.name;
+
+            const priceCell = document.createElement('td');
+            priceCell.textContent = pesoFormatter.format(product.price);
+
+            const actionsCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-btn';
+            deleteButton.dataset.id = product.id;
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', deleteProduct);
+            actionsCell.appendChild(deleteButton);
+
+            row.appendChild(idCell);
+            row.appendChild(nameCell);
+            row.appendChild(priceCell);
+            row.appendChild(actionsCell);
+            tableBody.appendChild(row);
         });
     };
 }
